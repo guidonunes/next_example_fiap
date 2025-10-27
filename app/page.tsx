@@ -6,6 +6,8 @@ import { FaPlus } from 'react-icons/fa';
 import ProductForm from './components/ProductForm';
 import { ProductCard } from './components/ProductCard';
 import { Product } from './lib/data';
+import { ReviewForm } from './components/ReviewForm';
+
 
 
 export default function ProdutosPage() {
@@ -20,7 +22,7 @@ export default function ProdutosPage() {
     try {
       setIsLoading(true);
       const res = await fetch('/api/products'); // URL relativa funciona em Client Components
-      if (!res.ok) throw new Error('Falha ao carregar produtos.');
+      if (!res.ok) throw new Error('Fail loading products');
       const data = await res.json();
       setProducts(data);
     } catch (err: any) {
@@ -47,7 +49,7 @@ export default function ProdutosPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(productData),
       });
-      if (!res.ok) throw new Error(isUpdating ? 'Falha ao atualizar produto.' : 'Falha ao criar produto.');
+      if (!res.ok) throw new Error(isUpdating ? 'Failed updating product.' : 'Failed creating new product.');
 
       // Otimista: Atualiza a UI antes de refazer o fetch
       // ou simplesmente refaz o fetch para garantir consistência
@@ -60,11 +62,11 @@ export default function ProdutosPage() {
   };
 
   const handleDeleteProduct = async (id: number) => {
-    if (!window.confirm('Tem certeza que deseja excluir este produto?')) return;
+    if (!window.confirm('Are you sure you want to delete this product?')) return;
 
     try {
       const res = await fetch(`/api/products/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Falha ao excluir produto.');
+      if (!res.ok) throw new Error('Failed deleting product.');
       // Atualiza a UI removendo o produto
       setProducts(products.filter(p => p.id !== id));
     } catch (err: any) {
@@ -83,22 +85,22 @@ export default function ProdutosPage() {
   };
 
   // Renderização condicional
-  if (isLoading) return <p className="text-center mt-8">Carregando produtos...</p>;
+  if (isLoading) return <p className="text-center mt-8">Loading products...</p>;
   if (error) return <p className="text-center mt-8 text-red-500">Erro: {error}</p>;
 
   return (
     <main className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-12">
-        <h1 className="text-4xl font-bold">Nossos Produtos</h1>
+        <h1 className="text-4xl font-bold">Next<span className="text-amber-300 ">JS</span> Store</h1>
+
         <button
           onClick={handleAddNew}
           className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full flex items-center gap-2 transition-colors"
         >
           <FaPlus />
-          <span>Novo Produto</span>
+          <span>Add New Product</span>
         </button>
       </div>
-
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
         {products.map((product) => (
           <ProductCard
@@ -108,6 +110,7 @@ export default function ProdutosPage() {
             onDelete={() => handleDeleteProduct(product.id)}
           />
         ))}
+
       </div>
 
       {isFormVisible && (
@@ -120,6 +123,10 @@ export default function ProdutosPage() {
           }}
         />
       )}
+      <ReviewForm />
+    <footer className="mt-16 text-center text-gray-500">
+        &copy; {new Date().getFullYear()} NextJS Store. All rights reserved.
+    </footer>
     </main>
   );
 }

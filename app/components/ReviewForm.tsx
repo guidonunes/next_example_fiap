@@ -23,18 +23,18 @@ export function ReviewForm() {
   }, [state.success]);
 
   return (
-    <form ref={formRef} action={formAction} className="mt-6 p-4 border rounded-lg bg-white text-black shadow-sm">
-      <h3 className="text-lg font-semibold mb-3  text-black">Write a review</h3>
-      <div className="mb-3">
-        <label htmlFor="author" className="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
-        <input type="text" name="author" id="author" required className="w-full p-2 border rounded-md text-black" />
+    <form ref={formRef} action={formAction} className="mt-6 p-4 border rounded-lg bg-back text-white shadow-sm">
+      <h3 className="text-lg font-semibold mb-3  text-amber-300">Leave a review</h3>
+      <div className="mb-3 text-amber-50">
+        <label htmlFor="author" className="block text-sm border-white font-medium text-white mb-1">Your Name</label>
+        <input type="text" name="author" id="author" required className="w-full p-2 border rounded-md text-white" />
         {state.errors?.author && (
           <p className="text-red-600 text-sm mt-1">{state.errors.author[0]}</p>
         )}
       </div>
       <div className="mb-3">
-        <label htmlFor="review" className="block text-sm font-medium text-gray-700 mb-1">Comment</label>
-        <textarea name="review" id="review" rows={3} required className="w-full p-2 border rounded-md text-black"></textarea>
+        <label htmlFor="review" className="block text-sm font-medium text-white mb-1">Comment</label>
+        <textarea name="review" id="review" rows={3} required className="w-full p-2 border rounded-md text-white"></textarea>
         {state.errors?.review && (
           <p className="text-red-600 text-sm mt-1">{state.errors.review[0]}</p>
         )}

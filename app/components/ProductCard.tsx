@@ -18,7 +18,7 @@ export function ProductCard({ product, onEdit, onDelete }: ProductCardProps) {
   return (
     <div className="border p-4 rounded-lg shadow-md">
       <h2 className="text-xl font-semibold mb-2">{product.name}</h2>
-      <p className="text-gray-700 mb-4">$ {product.price}</p>
+      <p className="text-amber-300 mb-4">$ {product.price}</p>
       <div className="mt-4">
         <button onClick={onEdit} className="bg-black hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2 transition-colors">
           <FaEdit className="inline "/> Edit

@@ -16,11 +16,16 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
 
   useEffect(() => {
     if (product) {
-      setName(product.name);
-      setPrice(String(product.price));
+      // schedule updates to avoid synchronous setState inside the effect
+      queueMicrotask(() => {
+        setName(product.name);
+        setPrice(String(product.price));
+      });
     } else {
-      setName('');
-      setPrice('');
+      queueMicrotask(() => {
+        setName('');
+        setPrice('');
+      });
     }
   }, [product]);
 
@@ -39,23 +44,23 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-      <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-4">{product ? 'Editar Produto' : 'Novo Produto'}</h2>
+      <div className="bg-black border p-8 rounded-lg shadow-xl w-full max-w-md">
+        <h2 className="text-2xl font-bold mb-4">{product ? 'Edit Product' : 'New Product'}</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label htmlFor="name" className="block text-gray-700 font-semibold mb-2">Título</label>
+            <label htmlFor="name" className="block text-amber-300 font-semibold mb-2">Name</label>
             <input type="text" id="name" value={name} onChange={e => setName(e.target.value)} className="w-full p-2 border rounded" required />
           </div>
           <div className="mb-4">
-            <label htmlFor="price" className="block text-gray-700 font-semibold mb-2">Preço</label>
+            <label htmlFor="price" className="block text-amber-300 font-semibold mb-2">Price</label>
             <input type="number" id="price" value={price} onChange={e => setPrice(e.target.value)} className="w-full p-2 border rounded" required step="0.01" />
           </div>
           <div className="flex justify-end gap-4">
             <button type="button" onClick={onCancel} className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition-colors">
-              Cancelar
+              Cancel
             </button>
             <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-colors">
-              Salvar
+              Save
             </button>
           </div>
         </form>
