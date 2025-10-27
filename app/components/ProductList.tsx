@@ -27,8 +27,11 @@ export default async function ProductList() {
       {data.products.map((product) => (
         <ProductCard
           key={product.id}
-          product={{ id: product.id, title: product.name, price: product.price }}
-        />
+          product={{ id: product.id, name: product.name, price: product.price }} onEdit={function (): void {
+            throw new Error("Function not implemented.");
+          } } onDelete={function (): void {
+            throw new Error("Function not implemented.");
+          } }        />
       ))}
     </div>
   );
