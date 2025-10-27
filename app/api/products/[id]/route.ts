@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { products } from "@/app/lib/data";
+import { isAuthenticated } from "@/app/lib/checkAuth";
 
 interface Params {
   id: string;
@@ -21,6 +22,11 @@ export async function GET(request: Request, context: { params: Promise<Params> }
 
 
 export async function PUT(request: Request, context: { params: Promise<Params> }) {
+  // Check authentication
+  if (!await isAuthenticated()) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const params = await context.params
   const id = parseInt(params.id);
   const index = products.findIndex((p) => p.id === id);
@@ -36,6 +42,11 @@ export async function PUT(request: Request, context: { params: Promise<Params> }
 }
 
 export async function DELETE(request: Request, context: { params: Promise<Params> }) {
+  // Check authentication
+  if (!await isAuthenticated()) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
    const params = await context.params
   const id = parseInt(params.id);
   const index = products.findIndex((p) => p.id === id);
