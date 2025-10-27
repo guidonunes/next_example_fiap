@@ -107,7 +107,11 @@ export default function ProdutosPage() {
             key={product.id}
             product={product}
             onEdit={() => handleEditProduct(product)}
-            onDelete={() => handleDeleteProduct(product.id)}
+            onDelete={() => {
+              if (product.id !== undefined) {
+                handleDeleteProduct(product.id);
+              }
+            }}
           />
         ))}
 
