@@ -19,7 +19,21 @@ export async function getReviews(): Promise<Review[]> {
   return reviews.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 }
 
-export async function submitReview(formData: FormData) {
+export interface FormState {
+  message: string;
+  errors?: {
+    author?: string[];
+    review?: string[];
+  };
+  success?: boolean;
+}
+
+
+export async function submitReview(
+  prevState: FormState,
+  formData: FormData) : Promise<FormState> {
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
   const author = formData.get('author') as string;
   const review = formData.get('review') as string;
 
@@ -44,5 +58,7 @@ export async function submitReview(formData: FormData) {
   console.log('Review submitted:', newReview);
 
   revalidatePath('/');
+
+  return{message: 'Review submitted successfully!', success: true};
 
 }

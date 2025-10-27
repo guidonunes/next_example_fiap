@@ -1,29 +1,125 @@
-import { Suspense } from "react";
-import ProductList from "./components/ProductList";
-import { PromoBanner } from "./components/PromoBanner";
-import { ProductReviews } from "./components/ProductReviews";
-import { ReviewForm } from "./components/ReviewForm";
-import CollapsibleSection from "./components/CollapsibleSection";
+// src/app/page.tsx (versão final e completa)
+'use client';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useState, useEffect } from 'react';
+import { FaPlus } from 'react-icons/fa';
+import ProductForm from './components/ProductForm';
+import { ProductCard } from './components/ProductCard';
+import { Product } from './lib/data';
 
-export default function Home() {
+
+export default function ProdutosPage() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isFormVisible, setIsFormVisible] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+  // Função para buscar os produtos
+  const fetchProducts = async () => {
+    try {
+      setIsLoading(true);
+      const res = await fetch('/api/products'); // URL relativa funciona em Client Components
+      if (!res.ok) throw new Error('Falha ao carregar produtos.');
+      const data = await res.json();
+      setProducts(data);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Buscar produtos na montagem do componente
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  // Funções de manipulação (Create, Update, Delete)
+  const handleSaveProduct = async (productData: Omit<Product, 'id'> | Product) => {
+    const isUpdating = 'id' in productData;
+    const url = isUpdating ? `/api/products/${productData.id}` : '/api/products';
+    const method = isUpdating ? 'PUT' : 'POST';
+
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(productData),
+      });
+      if (!res.ok) throw new Error(isUpdating ? 'Falha ao atualizar produto.' : 'Falha ao criar produto.');
+
+      // Otimista: Atualiza a UI antes de refazer o fetch
+      // ou simplesmente refaz o fetch para garantir consistência
+      await fetchProducts();
+    } catch (err: any) {
+      setError(err.message);
+    }
+    setIsFormVisible(false);
+    setEditingProduct(null);
+  };
+
+  const handleDeleteProduct = async (id: number) => {
+    if (!window.confirm('Tem certeza que deseja excluir este produto?')) return;
+
+    try {
+      const res = await fetch(`/api/products/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Falha ao excluir produto.');
+      // Atualiza a UI removendo o produto
+      setProducts(products.filter(p => p.id !== id));
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
+
+  const handleEditProduct = (product: Product) => {
+    setEditingProduct(product);
+    setIsFormVisible(true);
+  };
+
+  const handleAddNew = () => {
+    setEditingProduct(null);
+    setIsFormVisible(true);
+  };
+
+  // Renderização condicional
+  if (isLoading) return <p className="text-center mt-8">Carregando produtos...</p>;
+  if (error) return <p className="text-center mt-8 text-red-500">Erro: {error}</p>;
+
   return (
-    <div className="p-8 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6 text-center">Product Showcase</h1>
+    <main className="container mx-auto px-4 py-8">
+      <div className="flex justify-between items-center mb-12">
+        <h1 className="text-4xl font-bold">Nossos Produtos</h1>
+        <button
+          onClick={handleAddNew}
+          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full flex items-center gap-2 transition-colors"
+        >
+          <FaPlus />
+          <span>Novo Produto</span>
+        </button>
+      </div>
 
-      <Suspense fallback={<div className="text-center p-4">Carregando produtos...</div>}>
-        <ProductList />
-      </Suspense>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+        {products.map((product) => (
+          <ProductCard
+            key={product.id}
+            product={product}
+            onEdit={() => handleEditProduct(product)}
+            onDelete={() => handleDeleteProduct(product.id)}
+          />
+        ))}
+      </div>
 
-      <Suspense fallback={<div className="bg-gray-200 p-4 rounded-lg mt-4 text-black"><p>Carregando ofertas...</p></div>}>
-        <PromoBanner />
-      </Suspense>
-
-      <CollapsibleSection title="User Reviews">
-        <Suspense fallback={<p className="mt-8 text-center text-black">Carregando avaliações...</p>}>
-          <ProductReviews />
-        </Suspense>
-        <ReviewForm />
-      </CollapsibleSection>
-    </div>
+      {isFormVisible && (
+        <ProductForm
+          product={editingProduct}
+          onSave={handleSaveProduct}
+          onCancel={() => {
+            setIsFormVisible(false);
+            setEditingProduct(null);
+          }}
+        />
+      )}
+    </main>
   );
 }

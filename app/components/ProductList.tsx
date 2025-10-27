@@ -7,26 +7,13 @@ export interface Product {
 }
 
 async function fetchProducts(): Promise<{ products: Product[] }> {
-  await new Promise(resolve => setTimeout(()=> resolve(true), 1000));
+  const response = await fetch(`${process.env.API_BASE_URL}/api/products`, {
+    next: {
+      revalidate: 30
+    }
+  })
   return {
-    products: [
-
-      {
-        id: 1,
-        name: 'Knife',
-        price: 100
-      },
-      {
-        id: 2,
-        name: 'Air Frier',
-        price: 150
-      },
-      { id: 3,
-        name: 'Playstation 5',
-        price: 200
-      },
-
-    ]
+    products: await response.json()
 
   };
 }
