@@ -4,7 +4,7 @@ import { Product, products } from "@/app/lib/data";
 
 
 
-export async function GET(request: Request) {
+export async function GET() {
   return NextResponse.json(products);
 }
 
